@@ -35,7 +35,6 @@ checklistDepedentRoute.post('/:id/tasks', async(req, res) =>{
     let { name } = req.body.task 
     let task = new Task({ name, checklist: req.params.id })
 
-    
     try {
         await task.save()
         let checklist = await Checklist.findById(req.params.id)
@@ -47,6 +46,18 @@ checklistDepedentRoute.post('/:id/tasks', async(req, res) =>{
         res.status(422).render('tasks/new', { task: { ...task, errors }, checklistId: req.params.id})
     }
 })
+
+simpleRouter.put('/:id', async(req, res) => {
+    let task = await Task.findById(req.params.id)
+    try {
+        task.set(req.body.task)
+        await task.save()
+        res.status(200).json({ task })
+    } catch (error) {
+        let errors = error.errors
+        res.status(422).json({ task: {...errors }})
+    }
+}) 
 
 module.exports = { 
     checklistDepedent: checklistDepedentRoute,
